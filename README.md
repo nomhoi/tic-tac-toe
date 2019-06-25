@@ -1,2 +1,15 @@
-# tic-tac-toe
-Tic Tac Toe game
+# Tic Tac Toe
+Tic Tac Toe game, powered by Svelte. Build for [this tutorial](https://habr.com/ru/post/456474/).
+
+## Get started
+To install and play the game locally:
+```bash
+git clone git@github.com:nomhoi/tic-tac-toe.git
+cd tic-tac-toe
+npm install
+npm run dev
+```
+
+## License
+
+[LGPL](LICENSE)
