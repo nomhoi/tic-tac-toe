@@ -72,6 +72,15 @@ var app = (function () {
     function set_current_component(component) {
         current_component = component;
     }
+    // TODO figure out if we still want to support
+    // shorthand events, or if we want to implement
+    // a real bubbling mechanism
+    function bubble(component, event) {
+        const callbacks = component.$$.callbacks[event.type];
+        if (callbacks) {
+            callbacks.slice().forEach(fn => fn(event));
+        }
+    }
 
     const dirty_components = [];
     const resolved_promise = Promise.resolve();
@@ -128,6 +137,17 @@ var app = (function () {
     }
     const outroing = new Set();
     let outros;
+    function group_outros() {
+        outros = {
+            remaining: 0,
+            callbacks: []
+        };
+    }
+    function check_outros() {
+        if (!outros.remaining) {
+            run_all(outros.callbacks);
+        }
+    }
     function transition_in(block, local) {
         if (block && block.i) {
             outroing.delete(block);
@@ -284,10 +304,10 @@ var app = (function () {
     	return {
     		c: function create() {
     			button = element("button");
-    			t = text(ctx.state);
+    			t = text(ctx.value);
     			attr(button, "class", "svelte-d7rs2o");
-    			add_location(button, file, 9, 0, 116);
-    			dispose = listen(button, "click", ctx.handleClick);
+    			add_location(button, file, 4, 0, 48);
+    			dispose = listen(button, "click", ctx.click_handler);
     		},
 
     		l: function claim(nodes) {
@@ -300,8 +320,8 @@ var app = (function () {
     		},
 
     		p: function update(changed, ctx) {
-    			if (changed.state) {
-    				set_data(t, ctx.state);
+    			if (changed.value) {
+    				set_data(t, ctx.value);
     			}
     		},
 
@@ -320,22 +340,21 @@ var app = (function () {
 
     function instance($$self, $$props, $$invalidate) {
     	let { value = '' } = $$props;
-    	let state = '';
-    	
-    	function handleClick() {
-    		$$invalidate('state', state = 'X');
-    	}
 
     	const writable_props = ['value'];
     	Object.keys($$props).forEach(key => {
     		if (!writable_props.includes(key) && !key.startsWith('$$')) console.warn(`<Square> was created with unknown prop '${key}'`);
     	});
 
+    	function click_handler(event) {
+    		bubble($$self, event);
+    	}
+
     	$$self.$set = $$props => {
     		if ('value' in $$props) $$invalidate('value', value = $$props.value);
     	};
 
-    	return { value, state, handleClick };
+    	return { value, click_handler };
     }
 
     class Square extends SvelteComponentDev {
@@ -359,19 +378,24 @@ var app = (function () {
 
     function get_each_context(ctx, list, i) {
     	const child_ctx = Object.create(ctx);
-    	child_ctx.square = list[i];
+    	child_ctx.value = list[i];
     	child_ctx.i = i;
     	return child_ctx;
     }
 
-    // (7:1) {#each Array(9) as square, i}
+    // (17:1) {#each state.squares as value, i}
     function create_each_block(ctx) {
     	var current;
 
+    	function click_handler(...args) {
+    		return ctx.click_handler(ctx, ...args);
+    	}
+
     	var square = new Square({
-    		props: { value: ctx.i },
+    		props: { value: ctx.value },
     		$$inline: true
     	});
+    	square.$on("click", click_handler);
 
     	return {
     		c: function create() {
@@ -383,7 +407,12 @@ var app = (function () {
     			current = true;
     		},
 
-    		p: noop,
+    		p: function update(changed, new_ctx) {
+    			ctx = new_ctx;
+    			var square_changes = {};
+    			if (changed.state) square_changes.value = ctx.value;
+    			square.$set(square_changes);
+    		},
 
     		i: function intro(local) {
     			if (current) return;
@@ -406,13 +435,17 @@ var app = (function () {
     function create_fragment$1(ctx) {
     	var div0, t_1, div1, current;
 
-    	var each_value = Array(9);
+    	var each_value = ctx.state.squares;
 
     	var each_blocks = [];
 
     	for (var i = 0; i < each_value.length; i += 1) {
     		each_blocks[i] = create_each_block(get_each_context(ctx, each_value, i));
     	}
+
+    	const out = i => transition_out(each_blocks[i], 1, () => {
+    		each_blocks[i] = null;
+    	});
 
     	return {
     		c: function create() {
@@ -424,10 +457,10 @@ var app = (function () {
     			for (var i = 0; i < each_blocks.length; i += 1) {
     				each_blocks[i].c();
     			}
-    			attr(div0, "class", "status svelte-hkegsh");
-    			add_location(div0, file$1, 4, 0, 63);
-    			attr(div1, "class", "board svelte-hkegsh");
-    			add_location(div1, file$1, 5, 0, 105);
+    			attr(div0, "class", "status svelte-q3xjyi");
+    			add_location(div0, file$1, 14, 0, 244);
+    			attr(div1, "class", "board svelte-q3xjyi");
+    			add_location(div1, file$1, 15, 0, 286);
     		},
 
     		l: function claim(nodes) {
@@ -446,7 +479,29 @@ var app = (function () {
     			current = true;
     		},
 
-    		p: noop,
+    		p: function update(changed, ctx) {
+    			if (changed.state) {
+    				each_value = ctx.state.squares;
+
+    				for (var i = 0; i < each_value.length; i += 1) {
+    					const child_ctx = get_each_context(ctx, each_value, i);
+
+    					if (each_blocks[i]) {
+    						each_blocks[i].p(changed, child_ctx);
+    						transition_in(each_blocks[i], 1);
+    					} else {
+    						each_blocks[i] = create_each_block(child_ctx);
+    						each_blocks[i].c();
+    						transition_in(each_blocks[i], 1);
+    						each_blocks[i].m(div1, null);
+    					}
+    				}
+
+    				group_outros();
+    				for (; i < each_blocks.length; i += 1) out(i);
+    				check_outros();
+    			}
+    		},
 
     		i: function intro(local) {
     			if (current) return;
@@ -474,10 +529,28 @@ var app = (function () {
     	};
     }
 
+    function instance$1($$self, $$props, $$invalidate) {
+    	let state = {
+    		squares: Array(9).fill(''),
+    	};
+    	
+    	function handleClick(i) {
+    		const squares = state.squares.slice();
+    		squares[i] = 'X';
+    		state.squares = squares; $$invalidate('state', state);
+    	}
+
+    	function click_handler({ i }, e) {
+    		return handleClick(i);
+    	}
+
+    	return { state, handleClick, click_handler };
+    }
+
     class Board extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, null, create_fragment$1, safe_not_equal, []);
+    		init(this, options, instance$1, create_fragment$1, safe_not_equal, []);
     	}
     }
 

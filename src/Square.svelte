@@ -1,14 +1,9 @@
 <script>
 	export let value = '';
-	let state = '';
-	
-	function handleClick() {
-		state = 'X';
-	}
 </script>
 
-<button on:click={handleClick}>
-	{state}
+<button on:click>
+  {value}
 </button>
 
 <style>
