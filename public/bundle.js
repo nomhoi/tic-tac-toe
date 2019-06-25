@@ -49,6 +49,10 @@ var app = (function () {
     function space() {
         return text(' ');
     }
+    function listen(node, event, handler, options) {
+        node.addEventListener(event, handler, options);
+        return () => node.removeEventListener(event, handler, options);
+    }
     function attr(node, attribute, value) {
         if (value == null)
             node.removeAttribute(attribute);
@@ -57,6 +61,11 @@ var app = (function () {
     }
     function children(element) {
         return Array.from(element.childNodes);
+    }
+    function set_data(text, data) {
+        data = '' + data;
+        if (text.data !== data)
+            text.data = data;
     }
 
     let current_component;
@@ -270,13 +279,15 @@ var app = (function () {
     const file = "src\\Square.svelte";
 
     function create_fragment(ctx) {
-    	var button;
+    	var button, t, dispose;
 
     	return {
     		c: function create() {
     			button = element("button");
-    			attr(button, "class", "svelte-kw0a3y");
-    			add_location(button, file, 0, 0, 0);
+    			t = text(ctx.state);
+    			attr(button, "class", "svelte-d7rs2o");
+    			add_location(button, file, 9, 0, 116);
+    			dispose = listen(button, "click", ctx.handleClick);
     		},
 
     		l: function claim(nodes) {
@@ -285,9 +296,15 @@ var app = (function () {
 
     		m: function mount(target, anchor) {
     			insert(target, button, anchor);
+    			append(button, t);
     		},
 
-    		p: noop,
+    		p: function update(changed, ctx) {
+    			if (changed.state) {
+    				set_data(t, ctx.state);
+    			}
+    		},
+
     		i: noop,
     		o: noop,
 
@@ -295,14 +312,44 @@ var app = (function () {
     			if (detaching) {
     				detach(button);
     			}
+
+    			dispose();
     		}
     	};
+    }
+
+    function instance($$self, $$props, $$invalidate) {
+    	let { value = '' } = $$props;
+    	let state = '';
+    	
+    	function handleClick() {
+    		$$invalidate('state', state = 'X');
+    	}
+
+    	const writable_props = ['value'];
+    	Object.keys($$props).forEach(key => {
+    		if (!writable_props.includes(key) && !key.startsWith('$$')) console.warn(`<Square> was created with unknown prop '${key}'`);
+    	});
+
+    	$$self.$set = $$props => {
+    		if ('value' in $$props) $$invalidate('value', value = $$props.value);
+    	};
+
+    	return { value, state, handleClick };
     }
 
     class Square extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, null, create_fragment, safe_not_equal, []);
+    		init(this, options, instance, create_fragment, safe_not_equal, ["value"]);
+    	}
+
+    	get value() {
+    		throw new Error("<Square>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set value(value) {
+    		throw new Error("<Square>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
     }
 
@@ -313,14 +360,18 @@ var app = (function () {
     function get_each_context(ctx, list, i) {
     	const child_ctx = Object.create(ctx);
     	child_ctx.square = list[i];
+    	child_ctx.i = i;
     	return child_ctx;
     }
 
-    // (7:1) {#each Array(9) as square}
+    // (7:1) {#each Array(9) as square, i}
     function create_each_block(ctx) {
     	var current;
 
-    	var square = new Square({ $$inline: true });
+    	var square = new Square({
+    		props: { value: ctx.i },
+    		$$inline: true
+    	});
 
     	return {
     		c: function create() {
@@ -331,6 +382,8 @@ var app = (function () {
     			mount_component(square, target, anchor);
     			current = true;
     		},
+
+    		p: noop,
 
     		i: function intro(local) {
     			if (current) return;
@@ -372,9 +425,9 @@ var app = (function () {
     				each_blocks[i].c();
     			}
     			attr(div0, "class", "status svelte-hkegsh");
-    			add_location(div0, file$1, 4, 0, 64);
+    			add_location(div0, file$1, 4, 0, 63);
     			attr(div1, "class", "board svelte-hkegsh");
-    			add_location(div1, file$1, 5, 0, 106);
+    			add_location(div1, file$1, 5, 0, 105);
     		},
 
     		l: function claim(nodes) {

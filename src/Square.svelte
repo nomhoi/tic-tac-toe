@@ -1,8 +1,15 @@
 <script>
 	export let value = '';
+	let state = '';
+	
+	function handleClick() {
+		state = 'X';
+	}
 </script>
 
-<button>{value}</button>
+<button on:click={handleClick}>
+	{state}
+</button>
 
 <style>
 	button {
@@ -20,7 +27,6 @@
 		text-align: center;
 		width: 34px;
 	}
-	
 	button:focus { 
 		outline: none; 
 	}
