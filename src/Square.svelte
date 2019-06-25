@@ -22,6 +22,7 @@
 		text-align: center;
 		width: 34px;
 	}
+	
 	button:focus { 
 		outline: none; 
 	}
