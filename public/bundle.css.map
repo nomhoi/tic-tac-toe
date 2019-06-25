@@ -2,11 +2,15 @@
   "version": 3,
   "file": "bundle.css",
   "sources": [
-    "..\\src\\App.svelte"
+    "..\\src\\App.svelte",
+    "..\\src\\Board.svelte",
+    "..\\src\\Square.svelte"
   ],
   "sourcesContent": [
-    "<script>\n\texport let name;\n</script>\n\n<style>\n\th1 {\n\t\tcolor: purple;\n\t}\n</style>\n\n<h1>Hello {name}!</h1>\n"
+    "<script>\n\timport Board from './Board.svelte';\n</script>\n\n<div class=\"game\">\n\t<div class=\"game-board\">\n\t\t<Board />\n\t</div>\n\t<div class=\"game-info\">\n\t\t<div></div>\n\t\t<ol></ol>\n\t</div>\n</div>\n\n<style>\n\t.game {\n\t\tfont: 14px \"Century Gothic\", Futura, sans-serif;\n\t\tmargin: 20px;\n\t\tdisplay: flex;\n\t\tflex-direction: row;\n\t}\n\n\t.game-info {\n\t\tmargin-left: 20px;\n\t}\n\n\tol {\n\t\tpadding-left: 30px;\n\t}\n</style>",
+    "<script>\r\n  import Square from './Square.svelte';\r\n</script>\r\n\r\n<div class=\"status\">Next player: X</div>\r\n<div class=\"board\">\r\n\t{#each Array(9) as square}\r\n\t\t<Square />\r\n\t{/each}\r\n</div>\r\n\r\n<style>\r\n\t.board {\r\n\t\twidth: 102px;\r\n\t}\r\n\t\r\n\t.status {\r\n\t\tmargin-bottom: 10px;\r\n\t}\t\r\n</style>",
+    "<button></button>\r\n\r\n<style>\r\n\tbutton {\r\n\t\tbackground: #fff;\r\n\t\tborder: 1px solid #999;\r\n\t\tfloat: left;\r\n\t\tfont-size: 24px;\r\n\t\tfont-weight: bold;\r\n\t\tline-height: 34px;\r\n\t\theight: 34px;\r\n\t\tmargin-right: -1px;\r\n\t\tmargin-top: -1px;\r\n\t\tmargin-bottom: -1px;\r\n\t\tpadding: 0;\r\n\t\ttext-align: center;\r\n\t\twidth: 34px;\r\n\t}\r\n\t\r\n\tbutton:focus { \r\n\t\toutline: none; \r\n\t}\r\n</style>"
   ],
   "names": [],
-  "mappings": "AAKC,EAAE,cAAC,CAAC,AACH,KAAK,CAAE,MAAM,AACd,CAAC"
+  "mappings": "AAeC,KAAK,eAAC,CAAC,AACN,IAAI,CAAE,IAAI,CAAC,gBAAgB,CAAC,CAAC,MAAM,CAAC,CAAC,UAAU,CAC/C,MAAM,CAAE,IAAI,CACZ,OAAO,CAAE,IAAI,CACb,cAAc,CAAE,GAAG,AACpB,CAAC,AAED,UAAU,eAAC,CAAC,AACX,WAAW,CAAE,IAAI,AAClB,CAAC,AAED,EAAE,eAAC,CAAC,AACH,YAAY,CAAE,IAAI,AACnB,CAAC;AChBD,MAAM,cAAC,CAAC,AACP,KAAK,CAAE,KAAK,AACb,CAAC,AAED,OAAO,cAAC,CAAC,AACR,aAAa,CAAE,IAAI,AACpB,CAAC;ACfD,MAAM,cAAC,CAAC,AACP,UAAU,CAAE,IAAI,CAChB,MAAM,CAAE,GAAG,CAAC,KAAK,CAAC,IAAI,CACtB,KAAK,CAAE,IAAI,CACX,SAAS,CAAE,IAAI,CACf,WAAW,CAAE,IAAI,CACjB,WAAW,CAAE,IAAI,CACjB,MAAM,CAAE,IAAI,CACZ,YAAY,CAAE,IAAI,CAClB,UAAU,CAAE,IAAI,CAChB,aAAa,CAAE,IAAI,CACnB,OAAO,CAAE,CAAC,CACV,UAAU,CAAE,MAAM,CAClB,KAAK,CAAE,IAAI,AACZ,CAAC,AAED,oBAAM,MAAM,AAAC,CAAC,AACb,OAAO,CAAE,IAAI,AACd,CAAC"
 }
