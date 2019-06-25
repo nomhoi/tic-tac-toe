@@ -3,7 +3,7 @@
 </script>
 
 <button on:click>
-  {value}
+	{value}
 </button>
 
 <style>

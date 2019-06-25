@@ -383,7 +383,7 @@ var app = (function () {
     	return child_ctx;
     }
 
-    // (17:1) {#each state.squares as value, i}
+    // (19:1) {#each state.squares as value, i}
     function create_each_block(ctx) {
     	var current;
 
@@ -433,7 +433,7 @@ var app = (function () {
     }
 
     function create_fragment$1(ctx) {
-    	var div0, t_1, div1, current;
+    	var div0, t0, t1_value = ctx.state.xIsNext ? 'X' : 'O', t1, t2, div1, current;
 
     	var each_value = ctx.state.squares;
 
@@ -450,17 +450,18 @@ var app = (function () {
     	return {
     		c: function create() {
     			div0 = element("div");
-    			div0.textContent = "Next player: X";
-    			t_1 = space();
+    			t0 = text("Next player: ");
+    			t1 = text(t1_value);
+    			t2 = space();
     			div1 = element("div");
 
     			for (var i = 0; i < each_blocks.length; i += 1) {
     				each_blocks[i].c();
     			}
-    			attr(div0, "class", "status svelte-q3xjyi");
-    			add_location(div0, file$1, 14, 0, 244);
-    			attr(div1, "class", "board svelte-q3xjyi");
-    			add_location(div1, file$1, 15, 0, 286);
+    			attr(div0, "class", "status svelte-ifyn8r");
+    			add_location(div0, file$1, 16, 0, 319);
+    			attr(div1, "class", "board svelte-ifyn8r");
+    			add_location(div1, file$1, 17, 0, 387);
     		},
 
     		l: function claim(nodes) {
@@ -469,7 +470,9 @@ var app = (function () {
 
     		m: function mount(target, anchor) {
     			insert(target, div0, anchor);
-    			insert(target, t_1, anchor);
+    			append(div0, t0);
+    			append(div0, t1);
+    			insert(target, t2, anchor);
     			insert(target, div1, anchor);
 
     			for (var i = 0; i < each_blocks.length; i += 1) {
@@ -480,6 +483,10 @@ var app = (function () {
     		},
 
     		p: function update(changed, ctx) {
+    			if ((!current || changed.state) && t1_value !== (t1_value = ctx.state.xIsNext ? 'X' : 'O')) {
+    				set_data(t1, t1_value);
+    			}
+
     			if (changed.state) {
     				each_value = ctx.state.squares;
 
@@ -520,7 +527,7 @@ var app = (function () {
     		d: function destroy(detaching) {
     			if (detaching) {
     				detach(div0);
-    				detach(t_1);
+    				detach(t2);
     				detach(div1);
     			}
 
@@ -532,12 +539,14 @@ var app = (function () {
     function instance$1($$self, $$props, $$invalidate) {
     	let state = {
     		squares: Array(9).fill(''),
+    		xIsNext: true,
     	};
-    	
+
     	function handleClick(i) {
     		const squares = state.squares.slice();
-    		squares[i] = 'X';
+    		squares[i] = state.xIsNext ? 'X' : 'O';
     		state.squares = squares; $$invalidate('state', state);
+    		state.xIsNext = !state.xIsNext; $$invalidate('state', state);
     	}
 
     	function click_handler({ i }, e) {
