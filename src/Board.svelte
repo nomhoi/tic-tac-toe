@@ -1,11 +1,11 @@
 <script>
-  import Square from './Square.svelte';
+	import Square from './Square.svelte';
 </script>
 
 <div class="status">Next player: X</div>
 <div class="board">
-	{#each Array(9) as square}
-		<Square />
+	{#each Array(9) as square, i}
+		<Square value={i}/>
 	{/each}
 </div>
 

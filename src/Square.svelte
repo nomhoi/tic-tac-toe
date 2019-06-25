@@ -1,4 +1,8 @@
-<button></button>
+<script>
+	export let value = '';
+</script>
+
+<button>{value}</button>
 
 <style>
 	button {
