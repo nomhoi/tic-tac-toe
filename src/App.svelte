@@ -1,11 +1,30 @@
 <script>
-	export let name;
+	import Board from './Board.svelte';
 </script>
 
+<div class="game">
+	<div class="game-board">
+		<Board />
+	</div>
+	<div class="game-info">
+		<div></div>
+		<ol></ol>
+	</div>
+</div>
+
 <style>
-	h1 {
-		color: purple;
+	.game {
+		font: 14px "Century Gothic", Futura, sans-serif;
+		margin: 20px;
+		display: flex;
+		flex-direction: row;
+	}
+
+	.game-info {
+		margin-left: 20px;
+	}
+
+	ol {
+		padding-left: 30px;
 	}
 </style>
-
-<h1>Hello {name}!</h1>
