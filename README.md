@@ -9,7 +9,4 @@ cd tic-tac-toe
 npm install
 npm run dev
 ```
-
-## License
-
-[LGPL](LICENSE)
+Run the game in a browser: [http://localhost:5000/](http://localhost:5000/)
